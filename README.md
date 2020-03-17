@@ -14,4 +14,4 @@ A `To Listen` Queue Manager and a GCloud test Project
   - [ ] Infra diagram 
   - [ ] Configuration options/locations
 - [ ] Github actions
-- [ ] Issue pulling playlists (not including colabs)?
+- [ ] Clean up sign in/out flow
