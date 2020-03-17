@@ -15,3 +15,4 @@ A `To Listen` Queue Manager and a GCloud test Project
   - [ ] Configuration options/locations
 - [ ] Github actions
 - [ ] Clean up sign in/out flow
+- [ ] Figure out how to put all the configuration as code/scripts
