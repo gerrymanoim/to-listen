@@ -8,6 +8,7 @@ scopes = [
     "playlist-modify-private",
     "playlist-read-private", 
     "playlist-modify-public", 
+    "playlist-read-collaborative",
     "user-read-recently-played"
 ]
 # TODO - rotate upon actually using this
