@@ -1,0 +1,59 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Spotify To Listen Playlist</title>
+
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/7.5.0/firebase-app.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/7.5.0/firebase-auth.js"></script>
+
+    <script>
+        // Your web app's Firebase configuration
+        var firebaseConfig = {
+            apiKey: "AIzaSyDuKcZRCzK1wL4kajLJRaycRlXQivfYSOU",
+            authDomain: "spotify-to-listen-playlist.firebaseapp.com",
+            databaseURL: "https://spotify-to-listen-playlist.firebaseio.com",
+            projectId: "spotify-to-listen-playlist",
+            storageBucket: "spotify-to-listen-playlist.appspot.com",
+            messagingSenderId: "1091168141213",
+            appId: "1:1091168141213:web:52a4d0496c691b556c3974"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+    </script>
+
+    <script src="https://cdn.firebase.com/libs/firebaseui/2.6.2/firebaseui.js"></script>
+    <link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/2.6.2/firebaseui.css">
+    <!-- [END gae_python37_auth_include_firebaseui] -->
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+    <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
+
+</head>
+
+<body>
+
+    <h1>Spotify To Listen Playlist</h1>
+
+    <div id="firebaseui-auth-container"></div>
+
+    <button id="sign-out" hidden=true>Sign Out</button>
+
+    <div id="login-info" hidden=true>
+        <h2>Login info:</h2>
+        {% if user_data %}
+        <dl>
+            <dt>Name</dt>
+            <dd>{{ user_data['name'] }}</dd>
+            <dt>Email</dt>
+            <dd>{{ user_data['email'] }}</dd>
+        </dl>
+        <div id="spotify-auth"> Click <a href="{{ auth_url }}">here</a> to authenticate.</div>
+        {% elif error_message %}
+        <p>Error: {{ error_message }}</p>
+        {% endif %}
+    </div>
+</body>
+
+</html>
