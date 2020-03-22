@@ -1,9 +1,9 @@
 'use strict';
 
 window.addEventListener('load', function () {
-  document.getElementById('sign-out').onclick = function () {
-    firebase.auth().signOut();
-  };
+  // document.getElementById('sign-out').onclick = function () {
+  //   firebase.auth().signOut();
+  // };
 
   // FirebaseUI config.
   var uiConfig = {

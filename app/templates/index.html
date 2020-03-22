@@ -40,7 +40,7 @@
         </div>
         <div id="top-menu">
             {% if user_data %}
-            <a id="sign-out" hidden=true>sign out</a>
+            <a id="sign-out" href="#" onclick="firebase.auth().signOut();return false;">sign out</a>
             {% else %}
             <a href="{{ url_for('main') }}">home</a>
             {% endif %}
@@ -57,11 +57,10 @@
                 <li>A place to put listening recommendations for friends</li>
             </ul>
             <br />
-            <p>Log in, then click the button that will appear below to authorize with spotify</p>
             {% if user_data %}
-                <div id="spotify-auth">
-                    <a class="button" href="{{ auth_url }}">Authorize With Spotify</a>
-                </div>
+                <p><a href="{{ auth_url }}">Click here</a> to authorize with Spotify. We need permissions to read and modify your playlists and get your recently listened to songs.</p>
+            {% else %}
+                <p>Log in, then click the button that will appear below to authorize with spotify</p>
             {% endif %}
         </div>
         <div id="right-bar">

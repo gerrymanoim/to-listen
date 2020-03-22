@@ -69,12 +69,11 @@
             <div id="firebaseui-auth-container"></div>
             <div id="login-info" hidden=true>
                 {% if user_data %}
-                <dl>
-                    <dt>Name</dt>
-                    <dd>{{ user_data['name'] }}</dd>
-                    <dt>Email</dt>
-                    <dd>{{ user_data['email'] }}</dd>
-                </dl>
+                <p>Signed in as</p>
+                <ul>
+                    <li>Name: {{ user_data['name'] }}</li>
+                    <li>Email: {{ user_data['email'] }}</li>
+                </ul>
                 {% elif error_message %}
                 <p>Error: {{ error_message }}</p>
                 {% endif %}
