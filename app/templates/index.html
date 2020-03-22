@@ -33,26 +33,49 @@
 </head>
 
 <body>
-
-    <h1>Spotify To Listen Playlist</h1>
-
-    <div id="firebaseui-auth-container"></div>
-
-    <button id="sign-out" hidden=true>Sign Out</button>
-
-    <div id="login-info" hidden=true>
-        <h2>Login info:</h2>
-        {% if user_data %}
-        <dl>
-            <dt>Name</dt>
-            <dd>{{ user_data['name'] }}</dd>
-            <dt>Email</dt>
-            <dd>{{ user_data['email'] }}</dd>
-        </dl>
-        <div id="spotify-auth"> Click <a href="{{ auth_url }}">here</a> to authenticate.</div>
-        {% elif error_message %}
-        <p>Error: {{ error_message }}</p>
-        {% endif %}
+    <div id="banner">
+        <div id="logo">
+            <!-- TODO Logo or other picture-->
+            <a href="{{ url_for('main') }}" id="home-link">To Listen Playlist</a>
+        </div>
+        <div id="top-menu">
+            <a href="{{ url_for('main') }}">home</a>
+            <a id="sign-out" hidden=true>Sign Out</a>
+        </div>
+        <div style="clear:both"></div>
+    </div>
+    <div id="main-column">
+        <div id="left-column">
+            <p id="heading">Welcome!</p>
+            <p>What is this?</p>
+            <ul>
+                <li>A playlist that deletes songs once you've listened to them</li>
+                <li>A queue that doesn't have to sit in queue</li>
+                <li>A place to put listening recommendations for friends</li>
+            </ul>
+            <br />
+            <p>Log in, then authorize with the button below</p>
+            {% if user_data %}
+                <div id="spotify-auth">
+                    Click <a href="{{ auth_url }}">here</a> to authorize spotify.
+                </div>
+            {% endif %}
+        </div>
+        <div id="right-bar">
+            <div id="firebaseui-auth-container"></div>
+            <div id="login-info" hidden=true>
+                {% if user_data %}
+                <dl>
+                    <dt>Name</dt>
+                    <dd>{{ user_data['name'] }}</dd>
+                    <dt>Email</dt>
+                    <dd>{{ user_data['email'] }}</dd>
+                </dl>
+                {% elif error_message %}
+                <p>Error: {{ error_message }}</p>
+                {% endif %}
+            </div>
+        </div>
     </div>
 </body>
 

@@ -27,68 +27,58 @@
     <script src="https://cdn.firebase.com/libs/firebaseui/2.6.2/firebaseui.js"></script>
     <link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/2.6.2/firebaseui.css">
     
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mini.css/3.0.1/mini-default.min.css">
-
     <script src="{{ url_for('static', filename='app.js') }}"></script>
     <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1">
 
 </head>
 
 <body>
 
-    <h1>Spotify To Listen Playlist</h1>
-
-    <div id="firebaseui-auth-container"></div>
-
-    <button id="sign-out" hidden=true>Sign Out</button>
-
-    <div id="login-info" hidden=true>
-        <h2>Login info:</h2>
-        {% if user_data %}
-        <dl>
-            <dt>Name</dt>
-            <dd>{{ user_data['name'] }}</dd>
-            <dt>Email</dt>
-            <dd>{{ user_data['email'] }}</dd>
-        </dl>
-        Select a Playlist To Use
-        <form method="POST" action="/save_playlist">
-            <label for="playlist_id">Playlist:</label>
-            <select name="playlist_id" id="playlist_id">
-                {% for playlist in playlists %}
-                <option value="{{playlist['id']}}">{{playlist['name']}}</option>
-                {% endfor %}
-            </select>
-            <input type="submit" value="Submit">
-        </form>
-        <!-- <table id="recently-played">
-            <thead>
-                <tr>
-                    <th>Played At</th>
-                    <th>Track name</th>
-                    <th>Artists</th>
-                    <th>Spotify ID</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for song in songs %}
-                <tr>
-                    <td>{{ song['played_at'] }}</td>
-                    <td>{{ song['track']['name'] }}</td>
-                    <td>
-                        {% for artist in song['track']['artists'] %}
-                        {{ artist['name'] }},
-                        {% endfor %}
-                    </td>
-                    <td>{{ song['track']['id'] }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table> -->
-        {% endif %}
+    <div id="banner">
+        <div id="logo">
+            <!-- TODO Logo or other picture-->
+            <a href="{{ url_for('main') }}" id="home-link">To Listen Playlist</a>
+        </div>
+        <div id="top-menu">
+            <a id="sign-out" hidden=true>sign out</a>
+        </div>
+        <div style="clear:both"></div>
     </div>
+    <div id="main-column">
+        <div id="left-column">
+            {% if user_data %}
+            <p id="heading">Select a Playlist To Use</p>
+            <p>I'd recommend making a new one</p>
+            <form method="POST" action="/save_playlist">
+                <label for="playlist_id">Playlist:</label>
+                <select name="playlist_id" id="playlist_id">
+                    {% for playlist in playlists %}
+                    <option value="{{playlist['id']}}">{{playlist['name']}}</option>
+                    {% endfor %}
+                </select>
+                <input type="submit" value="Submit">
+            </form>
+            {% elif error_message %}
+            <p>Error: {{ error_message }}</p>
+            {% endif %}
+        </div>
+        <div id="right-bar">
+            <div id="firebaseui-auth-container"></div>
+            <div id="login-info" hidden=true>
+                {% if user_data %}
+                <dl>
+                    <dt>Name</dt>
+                    <dd>{{ user_data['name'] }}</dd>
+                    <dt>Email</dt>
+                    <dd>{{ user_data['email'] }}</dd>
+                </dl>
+                {% elif error_message %}
+                <p>Error: {{ error_message }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>        
 </body>
 
 </html>
