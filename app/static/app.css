@@ -8,16 +8,25 @@ body
 }
 
 p { margin-top:2px;margin-bottom:12px }
-li { margin-bottom:10px }
 
 h2 { font-size:110%;background:#eef} 
+
+a.button {
+  -webkit-appearance: button;
+  -moz-appearance: button;
+  appearance: button;
+
+  text-decoration: none;
+  color: initial;
+}
+
 
 #banner
 {
   background:white;
   color:black;
   border-bottom:1px dotted #aaa;
-  margin-bottom:2em;
+  margin-bottom: 1em;
   width:800px;
   padding-bottom:9px;
 }
@@ -44,7 +53,7 @@ h2 { font-size:110%;background:#eef}
 }
 
 #left-column {
-  flex: 70%;
+  flex: 66%;
 }
 
 #heading {
@@ -52,7 +61,7 @@ h2 { font-size:110%;background:#eef}
 }
 
 #right-bar {
-  flex: 30%;
+  flex: 33%;
   border:0px solid green;
   margin-left:20px;
   line-height:200%;

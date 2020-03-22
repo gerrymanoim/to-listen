@@ -39,8 +39,11 @@
             <a href="{{ url_for('main') }}" id="home-link">To Listen Playlist</a>
         </div>
         <div id="top-menu">
+            {% if user_data %}
+            <a id="sign-out" hidden=true>sign out</a>
+            {% else %}
             <a href="{{ url_for('main') }}">home</a>
-            <a id="sign-out" hidden=true>Sign Out</a>
+            {% endif %}
         </div>
         <div style="clear:both"></div>
     </div>
@@ -49,15 +52,15 @@
             <p id="heading">Welcome!</p>
             <p>What is this?</p>
             <ul>
-                <li>A playlist that deletes songs once you've listened to them</li>
-                <li>A queue that doesn't have to sit in queue</li>
+                <li>A playlist that deletes songs after you listen to them</li>
+                <li>A queue that doesn't have to sit in the main queue</li>
                 <li>A place to put listening recommendations for friends</li>
             </ul>
             <br />
-            <p>Log in, then authorize with the button below</p>
+            <p>Log in, then click the button that will appear below to authorize with spotify</p>
             {% if user_data %}
                 <div id="spotify-auth">
-                    Click <a href="{{ auth_url }}">here</a> to authorize spotify.
+                    <a class="button" href="{{ auth_url }}">Authorize With Spotify</a>
                 </div>
             {% endif %}
         </div>
@@ -65,12 +68,11 @@
             <div id="firebaseui-auth-container"></div>
             <div id="login-info" hidden=true>
                 {% if user_data %}
-                <dl>
-                    <dt>Name</dt>
-                    <dd>{{ user_data['name'] }}</dd>
-                    <dt>Email</dt>
-                    <dd>{{ user_data['email'] }}</dd>
-                </dl>
+                <p>Signed in as</p>
+                <ul>
+                    <li>Name: {{ user_data['name'] }}</li>
+                    <li>Email: {{ user_data['email'] }}</li>
+                </ul>
                 {% elif error_message %}
                 <p>Error: {{ error_message }}</p>
                 {% endif %}

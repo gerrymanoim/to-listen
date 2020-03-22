@@ -41,7 +41,9 @@
             <a href="{{ url_for('main') }}" id="home-link">To Listen Playlist</a>
         </div>
         <div id="top-menu">
+            {% if user_data %}
             <a id="sign-out" hidden=true>sign out</a>
+            {% endif %}
         </div>
         <div style="clear:both"></div>
     </div>
