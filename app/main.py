@@ -29,8 +29,7 @@ def main():
     id_token = request.cookies.get("token")
     claims, error_message = verify_login(id_token)
     if claims:
-        store_time(claims["email"], datetime.now(timezone.utc))
-        auth_url = get_auth_url(claims["email"])
+        auth_url = get_auth_url(claims["uid"])
     else:
         auth_url = None
 
@@ -48,15 +47,7 @@ def auth_callback():
         return f"Error: {maybe_error}"
     if error_message:
         return f"Auth Error: {error_message}"
-    recieved_state = request.args.get("state")
-    # if not is_valid_state(claims["email"], recieved_state):
-    #     return f"""
-    #     Could not match state.
-    #     Got {recieved_state}
-    #     User data says {get_spotify_auth(claims["email"])}
-    #     {recieved_state == get_spotify_auth(claims["email"])['state']}
-    #     and {is_valid_state(claims["email"], recieved_state)}
-    #     """
+
     code = request.args.get("code")
     client_id, client_secret = get_api_secrets()
     r = requests.post(
@@ -74,9 +65,9 @@ def auth_callback():
         return "Error getting token"
 
     token = r.json()
-    store_spotify_token(claims["email"], token)
-    user_profile = get_user_profile(claims["email"])
-    store_spotify_user_profile(claims["email"], user_profile)
+    store_spotify_token(claims["uid"], token)
+    user_profile = get_user_profile(claims["uid"])
+    store_spotify_user_profile(claims["uid"], user_profile)
     return redirect(url_for("user_info"))
 
 
@@ -86,11 +77,8 @@ def user_info():
     claims, error_message = verify_login(id_token)
     if error_message:
         return f"Auth Error: {error_message}"
-    # in general we'll actually poll this over time
-    # a_day_ago = int((datetime.now(timezone.utc) - timedelta(days=1)).timestamp() * 1000)
-    # songs = get_played_songs(claims["email"], from_time=a_day_ago)
 
-    playlists = get_user_playlists(claims["email"])
+    playlists = get_user_playlists(claims["uid"])
 
     return render_template("user_info.html", playlists=playlists, user_data=claims)
 
@@ -102,7 +90,7 @@ def save_playlist():
     if error_message:
         return f"Auth Error: {error_message}"
     playlist_id = request.form["playlist_id"]
-    user = db.collection("spotify_playlist").document(claims["email"])
+    user = db.collection("spotify_playlist").document(claims["uid"])
     user.set({"id": playlist_id})
     return redirect(url_for("user_info"))
 
@@ -113,8 +101,8 @@ def testing() -> str:
     return "Hello World!"
 
 
-def get_user_profile(email: str) -> Dict[str, Any]:
-    tokens = get_spotify_auth(email)
+def get_user_profile(uid: str) -> Dict[str, Any]:
+    tokens = get_spotify_auth(uid)
     r = requests.get(
         cfg["user_url"], headers={"Authorization": "Bearer " + tokens["access_token"]}
     )
@@ -123,8 +111,8 @@ def get_user_profile(email: str) -> Dict[str, Any]:
     return r.json()
 
 
-def get_played_songs(email: str, from_time: int) -> List[Dict]:
-    tokens = get_spotify_auth(email)
+def get_played_songs(uid: str, from_time: int) -> List[Dict]:
+    tokens = get_spotify_auth(uid)
     out = []
     before = int(datetime.now(timezone.utc).timestamp() * 1000)  # milliseconds
     query_url = cfg["recently_played_url"]
@@ -139,9 +127,9 @@ def get_played_songs(email: str, from_time: int) -> List[Dict]:
     return out
 
 
-def get_user_playlists(email: str) -> List[Dict]:
-    tokens = get_spotify_auth(email)
-    user = get_spotify_user_profile(email)
+def get_user_playlists(uid: str) -> List[Dict]:
+    tokens = get_spotify_auth(uid)
+    user = get_spotify_user_profile(uid)
     query_url = cfg["user_playlists_url"].format(user_id=user["id"])
     out = []
     while True:
@@ -159,7 +147,7 @@ def get_user_playlists(email: str) -> List[Dict]:
     return out
 
 
-def refresh_tokens(email: str, tokens: dict) -> dict:
+def refresh_tokens(uid: str, tokens: dict) -> dict:
     client_id, client_secret = get_api_secrets()
     client_info = f"{client_id}:{client_secret}".encode("utf-8")
     b64client = b64encode(client_info)
@@ -173,7 +161,7 @@ def refresh_tokens(email: str, tokens: dict) -> dict:
         return "Error getting token"
 
     new_tokens = r.json()
-    store_spotify_token(email, new_tokens)
+    store_spotify_token(uid, new_tokens)
     return new_tokens
 
 
@@ -192,6 +180,7 @@ def verify_login(id_token: str) -> Tuple[Optional[Dict], Optional[str]]:
             claims = google.oauth2.id_token.verify_firebase_token(
                 id_token, firebase_request_adapter
             )
+            store_claims(claims)
         except ValueError as exc:
             # This will be raised if the token is expired or any other
             # verification checks fail.
@@ -200,10 +189,10 @@ def verify_login(id_token: str) -> Tuple[Optional[Dict], Optional[str]]:
     return claims, error_message
 
 
-def get_auth_url(email: str) -> str:
+def get_auth_url(uid: str) -> str:
     """Get the spotify auth url we need the user to approve"""
     state = randint(10000, 99999)
-    store_spotify_auth(email, {"state": state})
+    store_spotify_auth(uid, {"state": state})
     client_id, client_secret = get_api_secrets()
     auth_url = (
         "{auth_url_base}"
@@ -218,47 +207,47 @@ def get_auth_url(email: str) -> str:
     return auth_url
 
 
-def store_spotify_auth(email: str, spotify_data: dict):
-    user = db.collection("spotify").document(email)
+def store_spotify_auth(uid: str, spotify_data: dict):
+    user = db.collection("spotify").document(uid)
     user.set(spotify_data, merge=True)
 
 
-def store_spotify_user_profile(email: str, spotify_data: dict):
-    user = db.collection("spotify_profile").document(email)
+def store_spotify_user_profile(uid: str, spotify_data: dict):
+    user = db.collection("spotify_profile").document(uid)
     user.set(spotify_data, merge=True)
 
 
-def store_spotify_token(email: str, token: dict):
+def store_spotify_token(uid: str, token: dict):
     expires_at = datetime.now(timezone.utc) + timedelta(seconds=token["expires_in"])
-    store_spotify_auth(email, {**token, "expires_at": expires_at})
+    store_spotify_auth(uid, {**token, "expires_at": expires_at})
 
 
-def get_spotify_auth(email: str) -> dict:
-    user = db.collection("spotify").document(email)
+def get_spotify_auth(uid: str) -> dict:
+    user = db.collection("spotify").document(uid)
     tokens = user.get().to_dict()
     # handle token refresh if needed
     if datetime.now(timezone.utc) > tokens["expires_at"]:
-        tokens = refresh_tokens(email, tokens)
+        tokens = refresh_tokens(uid, tokens)
     return tokens
 
 
-def get_spotify_user_profile(email: str) -> Dict:
-    user = db.collection("spotify_profile").document(email)
+def get_spotify_user_profile(uid: str) -> Dict:
+    user = db.collection("spotify_profile").document(uid)
     return user.get().to_dict()
 
 
-def get_spotify_playlist(email: str) -> Dict:
-    playlist = db.collection("spotify_playlist").document(email)
+def get_spotify_playlist(uid: str) -> Dict:
+    playlist = db.collection("spotify_playlist").document(uid)
     return playlist.get().to_dict()
 
 
-def is_valid_state(email: str, recieved_state: int):
-    return get_spotify_auth(email)["state"] == recieved_state
+def is_valid_state(uid: str, recieved_state: int):
+    return get_spotify_auth(uid)["state"] == recieved_state
 
 
-def store_time(email, dt):
-    user = db.collection("visit").document(email)
-    user.set({"timestamp": dt})
+def store_claims(claims: Dict[str]):
+    user = db.collection("claims").document(claims["uid"])
+    user.set({**claims, **{"last_used": datetime.now(timezone.utc)}}, merge=True)
 
 
 def get_api_secrets() -> Tuple[str, str]:
