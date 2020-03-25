@@ -29,7 +29,7 @@ def main():
     id_token = request.cookies.get("token")
     claims, error_message = verify_login(id_token)
     if claims:
-        auth_url = get_auth_url(claims["uid"])
+        auth_url = get_auth_url(claims["sub"])
     else:
         auth_url = None
 
@@ -65,9 +65,9 @@ def auth_callback():
         return "Error getting token"
 
     token = r.json()
-    store_spotify_token(claims["uid"], token)
-    user_profile = get_user_profile(claims["uid"])
-    store_spotify_user_profile(claims["uid"], user_profile)
+    store_spotify_token(claims["sub"], token)
+    user_profile = get_user_profile(claims["sub"])
+    store_spotify_user_profile(claims["sub"], user_profile)
     return redirect(url_for("user_info"))
 
 
@@ -78,7 +78,7 @@ def user_info():
     if error_message:
         return f"Auth Error: {error_message}"
 
-    playlists = get_user_playlists(claims["uid"])
+    playlists = get_user_playlists(claims["sub"])
 
     return render_template("user_info.html", playlists=playlists, user_data=claims)
 
@@ -90,7 +90,7 @@ def save_playlist():
     if error_message:
         return f"Auth Error: {error_message}"
     playlist_id = request.form["playlist_id"]
-    user = db.collection("spotify_playlist").document(claims["uid"])
+    user = db.collection("spotify_playlist").document(claims["sub"])
     user.set({"id": playlist_id})
     return redirect(url_for("user_info"))
 
@@ -245,8 +245,8 @@ def is_valid_state(uid: str, recieved_state: int):
     return get_spotify_auth(uid)["state"] == recieved_state
 
 
-def store_claims(claims: Dict[str]):
-    user = db.collection("claims").document(claims["uid"])
+def store_claims(claims: dict):
+    user = db.collection("claims").document(claims["sub"])
     user.set({**claims, **{"last_used": datetime.now(timezone.utc)}}, merge=True)
 
 

@@ -7,6 +7,7 @@ A `To Listen` Queue Manager and a GCloud test Project
 - [ ] Open Source this
   - [ ] Clean up the firebase DB rules
   - [ ] Clean up the very bad auth code
+  - [X] Auth uses uids instead of emaisl
   - [ ] Clean up the entire `main.py` flow - we need some classes
   - [X] Make this look like not a pile of hot garbage.
 - [ ] Add documentation
