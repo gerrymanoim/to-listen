@@ -2,6 +2,7 @@ auth_url_base = "https://accounts.spotify.com/authorize?"
 token_url = "https://accounts.spotify.com/api/token"
 user_url = "https://api.spotify.com/v1/me"
 user_playlists_url = "https://api.spotify.com/v1/users/{user_id}/playlists?limit=50&offset=0"
+playlist_url = "https://api.spotify.com/v1/playlists/{playlist_id}"
 recently_played_url = "https://api.spotify.com/v1/me/player/recently-played?limit=50"
 redirect_uri = "https://spotify-to-listen-playlist.appspot.com/auth_callback"
 scopes = [

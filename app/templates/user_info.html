@@ -52,11 +52,20 @@
             {% if user_data %}
             <p id="heading">Select a Playlist To Use</p>
             <p>I'd recommend making a new one</p>
+            {% if saved_playlist %}
+            <p>Currently selected playlist: <u>{{ saved_playlist['name'] }}</u></p>
+            {% else %}
+            <p>No playlist currently selected</p>
+            {% endif %}
             <form method="POST" action="/save_playlist">
                 <label for="playlist_id">Playlist:</label>
                 <select name="playlist_id" id="playlist_id">
                     {% for playlist in playlists %}
-                    <option value="{{playlist['id']}}">{{playlist['name']}}</option>
+                        {% if saved_playlist and playlist['id'] == saved_playlist['id'] %}
+                        <option value="{{playlist['id']}}" selected>{{playlist['name']}}</option>
+                        {% else %}
+                        <option value="{{playlist['id']}}">{{playlist['name']}}</option>
+                        {% endif %}
                     {% endfor %}
                 </select>
                 <input type="submit" value="Submit">

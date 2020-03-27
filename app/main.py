@@ -79,8 +79,14 @@ def user_info():
         return f"Auth Error: {error_message}"
 
     playlists = get_user_playlists(claims["sub"])
+    saved_playlist = get_spotify_playlist(claims["sub"])
 
-    return render_template("user_info.html", playlists=playlists, user_data=claims)
+    return render_template(
+        "user_info.html",
+        playlists=playlists,
+        saved_playlist=saved_playlist,
+        user_data=claims,
+    )
 
 
 @app.route("/save_playlist", methods=["POST"])
@@ -88,10 +94,11 @@ def save_playlist():
     id_token = request.cookies.get("token")
     claims, error_message = verify_login(id_token)
     if error_message:
+        log.error("Error saving playlist")
         return f"Auth Error: {error_message}"
     playlist_id = request.form["playlist_id"]
-    user = db.collection("spotify_playlist").document(claims["sub"])
-    user.set({"id": playlist_id})
+    playlist = get_user_playlist(claims["sub"], playlist_id)
+    store_spotify_playlist(claims["sub"], playlist)
     return redirect(url_for("user_info"))
 
 
@@ -123,6 +130,17 @@ def get_user_playlists(uid: str) -> List[Dict]:
         query_url = playlists["next"]
 
     return out
+
+
+def get_user_playlist(uid: str, playlist_id: str) -> Dict[str, Any]:
+    tokens = get_spotify_auth(uid)
+    query_url = cfg["playlist_url"].format(playlist_id=playlist_id)
+    r = requests.get(
+        query_url, headers={"Authorization": "Bearer " + tokens["access_token"]}
+    )
+    if not r.ok:
+        log.error("Trouble gettings single user playlist %s: %s", r, r.text)
+    return r.json()
 
 
 def refresh_tokens(uid: str, tokens: dict) -> dict:
@@ -198,6 +216,11 @@ def store_spotify_user_profile(uid: str, spotify_data: dict):
 def store_spotify_token(uid: str, token: dict):
     expires_at = datetime.now(timezone.utc) + timedelta(seconds=token["expires_in"])
     store_spotify_auth(uid, {**token, "expires_at": expires_at})
+
+
+def store_spotify_playlist(uid: str, playlist: dict):
+    user = db.collection("spotify_playlist").document(uid)
+    user.set(playlist)
 
 
 def get_spotify_auth(uid: str) -> dict:
