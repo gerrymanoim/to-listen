@@ -81,7 +81,8 @@ def get_spotify_auth(uid: str) -> Dict:
     auth = db.collection("spotify").document(uid)
     tokens = auth.get().to_dict()
     # handle token refresh if needed
-    if datetime.now(timezone.utc) > tokens["expires_at"]:
+    func_run_time = datetime.now(timezone.utc)-timedelta(seconds=10)
+    if func_run_time > tokens["expires_at"]:
         tokens = refresh_tokens(uid, tokens)
     return tokens
 
