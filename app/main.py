@@ -95,12 +95,6 @@ def save_playlist():
     return redirect(url_for("user_info"))
 
 
-@app.route("/testing")
-def testing() -> str:
-    """Just a test."""
-    return "Hello World!"
-
-
 def get_user_profile(uid: str) -> Dict[str, Any]:
     tokens = get_spotify_auth(uid)
     r = requests.get(
@@ -109,22 +103,6 @@ def get_user_profile(uid: str) -> Dict[str, Any]:
     if not r.ok:
         log.error("Error getting user profile %s: %s", r, r.text)
     return r.json()
-
-
-def get_played_songs(uid: str, from_time: int) -> List[Dict]:
-    tokens = get_spotify_auth(uid)
-    out = []
-    before = int(datetime.now(timezone.utc).timestamp() * 1000)  # milliseconds
-    query_url = cfg["recently_played_url"]
-    while before > from_time:
-        songs = requests.get(
-            query_url, headers={"Authorization": "Bearer " + tokens["access_token"]}
-        ).json()
-        out.extend(songs["items"])
-        query_url = songs["next"]
-        before = int(songs["cursors"]["before"])
-
-    return out
 
 
 def get_user_playlists(uid: str) -> List[Dict]:
