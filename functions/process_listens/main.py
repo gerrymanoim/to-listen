@@ -22,15 +22,15 @@ def process_listens(event, context):
          event (dict): Event payload.
          context (google.cloud.functions.Context): Metadata for the event.
     """
-    email = b64decode(event["data"]).decode("utf-8")
-    playlist = get_spotify_playlist(email)
+    uid = b64decode(event["data"]).decode("utf-8")
+    playlist = get_spotify_playlist(uid)
 
-    songs = get_played_songs(email)
+    songs = get_played_songs(uid)
     if not songs:
         log.info("No listens, nothing to do")
         # No listens, nothing to do
         return
-    tokens = get_spotify_auth(email)
+    tokens = get_spotify_auth(uid)
     tracks = [{"uri": song["track"]["uri"]} for song in songs]
 
     r = requests.delete(
@@ -41,11 +41,11 @@ def process_listens(event, context):
     if not r.ok:
         log.error("Error deleting from playlist %s: %s", r, r.text)
         raise RuntimeError("Error deleting from playlist %s", r)
-    store_spotify_playlist(email, {"last_run": datetime.now(timezone.utc)})
+    store_spotify_playlist(uid, {"last_run": datetime.now(timezone.utc)})
 
 
-def get_played_songs(email: str) -> List[Dict]:
-    tokens = get_spotify_auth(email)
+def get_played_songs(uid: str) -> List[Dict]:
+    tokens = get_spotify_auth(uid)
     r = requests.get(
         PLAYED_URL, headers={"Authorization": "Bearer " + tokens["access_token"]}
     )
@@ -59,7 +59,7 @@ def get_played_songs(email: str) -> List[Dict]:
     return songs["items"]
 
 
-def refresh_tokens(email: str, tokens: dict) -> dict:
+def refresh_tokens(uid: str, tokens: dict) -> dict:
     client_id, client_secret = get_api_secrets()
     client_info = f"{client_id}:{client_secret}".encode("utf-8")
     b64client = b64encode(client_info)
@@ -73,31 +73,31 @@ def refresh_tokens(email: str, tokens: dict) -> dict:
         return "Error getting token"
 
     new_tokens = r.json()
-    store_spotify_token(email, new_tokens)
+    store_spotify_token(uid, new_tokens)
     return new_tokens
 
 
-def get_spotify_auth(email: str) -> Dict:
-    auth = db.collection("spotify").document(email)
+def get_spotify_auth(uid: str) -> Dict:
+    auth = db.collection("spotify").document(uid)
     tokens = auth.get().to_dict()
     # handle token refresh if needed
     if datetime.now(timezone.utc) > tokens["expires_at"]:
-        tokens = refresh_tokens(email, tokens)
+        tokens = refresh_tokens(uid, tokens)
     return tokens
 
 
-def get_spotify_user_profile(email: str) -> Dict:
-    user = db.collection("spotify_profile").document(email)
+def get_spotify_user_profile(uid: str) -> Dict:
+    user = db.collection("spotify_profile").document(uid)
     return user.get().to_dict()
 
 
-def get_spotify_playlist(email: str) -> Dict:
-    playlist = db.collection("spotify_playlist").document(email)
+def get_spotify_playlist(uid: str) -> Dict:
+    playlist = db.collection("spotify_playlist").document(uid)
     return playlist.get().to_dict()
 
 
-def store_spotify_playlist(email: str, spotify_data: dict):
-    playlist = db.collection("spotify_playlist").document(email)
+def store_spotify_playlist(uid: str, spotify_data: dict):
+    playlist = db.collection("spotify_playlist").document(uid)
     playlist.set(spotify_data, merge=True)
 
 
@@ -117,11 +117,11 @@ def get_api_secrets() -> Tuple[str, str]:
     return (client_id, client_secret)
 
 
-def store_spotify_auth(email: str, spotify_data: dict):
-    user = db.collection("spotify").document(email)
+def store_spotify_auth(uid: str, spotify_data: dict):
+    user = db.collection("spotify").document(uid)
     user.set(spotify_data, merge=True)
 
 
-def store_spotify_token(email: str, token: dict):
+def store_spotify_token(uid: str, token: dict):
     expires_at = datetime.now(timezone.utc) + timedelta(seconds=token["expires_in"])
-    store_spotify_auth(email, {**token, "expires_at": expires_at})
+    store_spotify_auth(uid, {**token, "expires_at": expires_at})
