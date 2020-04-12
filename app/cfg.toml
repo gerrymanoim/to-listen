@@ -12,6 +12,5 @@ scopes = [
     "playlist-read-collaborative",
     "user-read-recently-played"
 ]
-# TODO - rotate upon actually using this
-# cloud kms?
+
 project_id = "1091168141213"
