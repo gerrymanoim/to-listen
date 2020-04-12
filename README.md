@@ -2,17 +2,16 @@
 
 A `To Listen` Queue Manager and a GCloud test Project
 
-## Todo 
+## What?
 
-- [ ] Open Source this
-  - [ ] Clean up the firebase DB rules
-  - [ ] Clean up the very bad auth code
-  - [X] Auth uses uids instead of emaisl
-  - [ ] Clean up the entire `main.py` flow - we need some classes
-  - [X] Make this look like not a pile of hot garbage.
-- [ ] Add documentation
-  - [ ] Infra diagram 
-  - [ ] Configuration options/locations
-- [ ] Github actions
-- [ ] Clean up sign out flow, currently id blows up
-- [ ] Figure out how to put all the gcloud configuration/setup as code/scripts
+![Home Page](/img/screenshot.png?raw=true)
+
+To listen tracks what you're listenign to on spotify and removes things you've listened to from a playlist.
+
+## How?
+
+There are three components:
+
+1. A Flask application running on Google App Engine that manages the user facing website, registration, playlist selection, and authorization callback. 
+2. A Cloud Function which runs on a schedule and publishes a PubSub message for every playlist that needs to be  processed. 
+3. A Cloud Function, triggered on PubSub messages, which grabs listened songs for a user and removes them from a playlist
