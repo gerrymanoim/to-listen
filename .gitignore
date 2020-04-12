@@ -1,3 +1,6 @@
+# service accounts
+service_accounts/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

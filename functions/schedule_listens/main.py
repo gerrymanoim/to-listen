@@ -15,6 +15,6 @@ def schedule_listens(event, context):
          event (dict): Event payload.
          context (google.cloud.functions.Context): Metadata for the event.
     """
-    users = db.collection("spotify_profile").stream()
+    users = db.collection("spotify_playlist").stream()
     for user in users:
         publisher.publish(topic_path, user.id.encode())

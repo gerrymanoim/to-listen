@@ -1,0 +1,29 @@
+name: Release Process Listens Cloud Function
+
+on:
+  push:
+    branches:
+    - master
+    paths:
+    - 'functions/process_listens/*'
+env:
+  PROJECT_ID: ${{ secrets.GCE_PROJECT }}
+
+jobs:
+  deploy:
+    name: Deploy Cloud Function
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+      with:
+        version: '286.0.0'
+        service_account_email: ${{ secrets.GCE_SA_EMAIL }}
+        service_account_key: ${{ secrets.GCE_SA_KEY }}
+        project_id: ${{ secrets.GCE_PROJECT }}
+    - name: Deploy
+      run: |-
+        cd functions/process_listens && \
+          gcloud functions deploy process_listens
