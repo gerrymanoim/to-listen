@@ -1,6 +1,6 @@
-Flask==1.1.1
-toml==0.10.0
-requests==2.22.0
-google-cloud-firestore==1.6.2
-google-cloud-secret-manager==0.2.0
-google-auth==1.6.3
+Flask==1.1.2
+toml==0.10.2
+requests==2.25.0
+google-cloud-firestore==2.0.1
+google-cloud-secret-manager==2.0.0
+google-auth==1.23.0
