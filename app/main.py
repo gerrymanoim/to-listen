@@ -17,9 +17,8 @@ from google.cloud import secretmanager_v1beta1 as secretmanager
 secrets_client = secretmanager.SecretManagerServiceClient()
 firebase_request_adapter = ga_requests.Request()
 
-
-cfg = tomllib.load("cfg.toml")
-
+with open("cfg.toml", "rb") as f:
+    data = tomllib.load(f)
 
 # If `entrypoint` is not defined in app.yaml, App Engine will look for an app
 # called `app` in `main.py`.
