@@ -5,9 +5,8 @@
     <title>Spotify To Listen Playlist</title>
 
     <!-- The core Firebase JS SDK is always required and must be listed first -->
-    <script src="https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js"></script>
-
-    <script src="https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-auth-compat.js"></script>
 
     <script>
         // Your web app's Firebase configuration
@@ -23,9 +22,9 @@
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
     </script>
-
-    <script src="https://cdn.firebase.com/libs/firebaseui/6.1.0/firebaseui.js"></script>
-    <link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/6.1.0/firebaseui.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/ui/6.1.0/firebase-ui-auth.js"></script>
+    <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/6.1.0/firebase-ui-auth.css" />
 
     <script src="{{ url_for('static', filename='app.js') }}"></script>
     <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
