@@ -8,7 +8,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import google.oauth2.id_token
 import requests
-import toml
+import tomllib
 from flask import Flask, redirect, render_template, request, url_for
 from google.auth.transport import requests as ga_requests
 from google.cloud import firestore
@@ -18,7 +18,7 @@ secrets_client = secretmanager.SecretManagerServiceClient()
 firebase_request_adapter = ga_requests.Request()
 
 
-cfg = toml.load("cfg.toml")
+cfg = tomllib.load("cfg.toml")
 
 
 # If `entrypoint` is not defined in app.yaml, App Engine will look for an app

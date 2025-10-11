@@ -1,0 +1,10 @@
+[project]
+name = "app"
+version = "0.1.0"
+dependencies = [
+    "flask>=3.1.2",
+    "google-auth>=2.41.1",
+    "google-cloud-firestore>=2.21.0",
+    "google-cloud-secret-manager>=2.24.0",
+    "requests>=2.32.5",
+]
