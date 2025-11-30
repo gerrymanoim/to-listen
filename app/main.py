@@ -18,7 +18,7 @@ secrets_client = secretmanager.SecretManagerServiceClient()
 firebase_request_adapter = ga_requests.Request()
 
 with open("cfg.toml", "rb") as f:
-    data = tomllib.load(f)
+    cfg = tomllib.load(f)
 
 # If `entrypoint` is not defined in app.yaml, App Engine will look for an app
 # called `app` in `main.py`.
@@ -43,7 +43,8 @@ def main():
     state = randint(10000, 99999)
     user["spotify"] = {"state": state}
     return render_index(
-        auth_url=build_auth_url(state), user_data=user["claims"],
+        auth_url=build_auth_url(state),
+        user_data=user["claims"],
     )
 
 
@@ -121,7 +122,6 @@ class TokenExpiredException(Exception):
 
 
 class User:
-
     valid_keys = ("claims", "spotify", "spotify_playlist", "spotify_profile")
 
     def __init__(self, uid: str):
@@ -208,9 +208,7 @@ class Spotify:
         return cls(user.uid, auth["access_token"])
 
     def _get(self, url: str):
-        r = requests.get(
-            url, headers={"Authorization": "Bearer " + self.access_token}
-        )
+        r = requests.get(url, headers={"Authorization": "Bearer " + self.access_token})
         if not r.ok:
             log.error(f"Error in GET {url}: {r.text} - {r}")
             # raise?
@@ -231,12 +229,7 @@ class Spotify:
         while True:
             playlists = self._get(url)
             # TODO - handle error
-            out.extend(
-                [
-                    {"id": p["id"], "name": p["name"]}
-                    for p in playlists["items"]
-                ]
-            )
+            out.extend([{"id": p["id"], "name": p["name"]} for p in playlists["items"]])
             if not playlists["next"]:
                 break
             url = playlists["next"]
