@@ -31,31 +31,13 @@ window.addEventListener('load', function () {
     
     // FirebaseUI config - use POPUP mode to avoid redirect issues
     var uiConfig = {
-      signInFlow: 'popup',  // Use popup instead of redirect
+      signInFlow: 'popup',
+      signInSuccessUrl: '/',  // Just redirect to home after sign-in
       signInOptions: [
         firebase.auth.GoogleAuthProvider.PROVIDER_ID,
         firebase.auth.EmailAuthProvider.PROVIDER_ID,
       ],
-      tosUrl: '<your-tos-url>',
-      callbacks: {
-        signInSuccessWithAuthResult: function(authResult, redirectUrl) {
-          console.log('signInSuccessWithAuthResult called', authResult.user.email);
-          authResult.user.getIdToken().then(function(token) {
-            console.log('Got token in callback, length:', token.length);
-            setCookie("token", token);
-            console.log('Token cookie set, reloading page');
-            // Reload the page to update the UI with the token
-            window.location.reload();
-          }).catch(function(error) {
-            console.error('Error getting token:', error);
-          });
-          // Return false immediately to prevent FirebaseUI from trying to redirect
-          return false;
-        },
-        uiShown: function() {
-          console.log('FirebaseUI widget shown');
-        }
-      }
+      tosUrl: '<your-tos-url>'
     };
 
     // Initialize the FirebaseUI Widget using Firebase.
