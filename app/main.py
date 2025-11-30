@@ -36,8 +36,12 @@ def render_index(*, auth_url=None, user_data=None, error_message=None):
 
 @app.route("/")
 def main():
+    token = request.cookies.get("token")
+    if not token or token == "":
+        # No token, user needs to sign in
+        return render_index()
     try:
-        user = User.from_request_token(request.cookies.get("token"))
+        user = User.from_request_token(token)
     except ValueError as e:
         return render_index(error_message=str(e))
     state = randint(10000, 99999)
@@ -52,8 +56,11 @@ def main():
 def auth_callback():
     if r_error := request.args.get("error"):
         return f"Error: {r_error}"
+    token = request.cookies.get("token")
+    if not token or token == "":
+        return "Auth Error: No authentication token found"
     try:
-        user = User.from_request_token(request.cookies.get("token"))
+        user = User.from_request_token(token)
     except ValueError as e:
         return f"Auth Error: {e}"
 
@@ -82,8 +89,11 @@ def auth_callback():
 
 @app.route("/user_info")
 def user_info():
+    token = request.cookies.get("token")
+    if not token or token == "":
+        return "Error: No authentication token found"
     try:
-        user = User.from_request_token(request.cookies.get("token"))
+        user = User.from_request_token(token)
         spotify = Spotify.from_user(user)
     except ValueError as e:
         return f"Auth Error: {e}"
@@ -100,8 +110,11 @@ def user_info():
 
 @app.route("/save_playlist", methods=["POST"])
 def save_playlist():
+    token = request.cookies.get("token")
+    if not token or token == "":
+        return "Auth Error: No authentication token found"
     try:
-        user = User.from_request_token(request.cookies.get("token"))
+        user = User.from_request_token(token)
         spotify = Spotify.from_user(user)
     except ValueError as e:
         return f"Auth Error: {e}"

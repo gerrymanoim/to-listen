@@ -40,13 +40,17 @@ window.addEventListener('load', function () {
       callbacks: {
         signInSuccessWithAuthResult: function(authResult, redirectUrl) {
           console.log('signInSuccessWithAuthResult called', authResult.user.email);
-          return authResult.user.getIdToken().then(function(token) {
+          authResult.user.getIdToken().then(function(token) {
             console.log('Got token in callback, length:', token.length);
             setCookie("token", token);
-            document.getElementById('login-info').hidden = false;
-            // Don't redirect - return false to stay on same page
-            return false;
+            console.log('Token cookie set, reloading page');
+            // Reload the page to update the UI with the token
+            window.location.reload();
+          }).catch(function(error) {
+            console.error('Error getting token:', error);
           });
+          // Return false immediately to prevent FirebaseUI from trying to redirect
+          return false;
         },
         uiShown: function() {
           console.log('FirebaseUI widget shown');
