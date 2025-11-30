@@ -20,7 +20,19 @@ window.addEventListener('load', function () {
 
     ],
     // Terms of service url.
-    tosUrl: '<your-tos-url>'
+    tosUrl: '<your-tos-url>',
+    callbacks: {
+      signInSuccessWithAuthResult: function(authResult, redirectUrl) {
+        // Set the token cookie before redirecting
+        authResult.user.getIdToken().then(function(token) {
+          document.cookie = "token=" + token;
+          // Return true to redirect to signInSuccessUrl
+          window.location.assign(redirectUrl);
+        });
+        // Return false to prevent automatic redirect - we'll do it manually after setting cookie
+        return false;
+      }
+    }
   };
 
   // Initialize the FirebaseUI Widget using Firebase.
