@@ -23,6 +23,9 @@ window.addEventListener('load', function () {
     tosUrl: '<your-tos-url>'
   };
 
+  // Initialize the FirebaseUI Widget using Firebase.
+  var ui = firebaseui.auth.AuthUI.getInstance() || new firebaseui.auth.AuthUI(firebase.auth());
+
   firebase.auth().onAuthStateChanged(function (user) {
     if (user) {
       // User is signed in, so display the "sign out" button and login info.
@@ -34,18 +37,16 @@ window.addEventListener('load', function () {
         // SECURITY NOTE: As cookies can easily be modified, only put the
         // token (which is verified server-side) in a cookie; do not add other
         // user information.
-        document.cookie = "token=" + token + ";path=/";
+        document.cookie = "token=" + token;
       });
     } else {
       // User is signed out.
-      // Initialize the FirebaseUI Widget using Firebase.
-      var ui = new firebaseui.auth.AuthUI(firebase.auth());
       // Show the Firebase login button.
       ui.start('#firebaseui-auth-container', uiConfig);
       // Update the login state indicators.
       document.getElementById('login-info').hidden = true;
       // Clear the token cookie.
-      document.cookie = "token=;path=/";
+      document.cookie = "token=";
     }
   }, function (error) {
     console.log(error);
